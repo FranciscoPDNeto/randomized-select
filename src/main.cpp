@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 
-#include "eratosthenes.h"
+#include "randomizedSelect.h"
 
 int main(int argc, char** argv) {
   if (argc != 4)
@@ -14,7 +14,8 @@ int main(int argc, char** argv) {
 
   unsigned int setSize = std::stoul(argv[1]);
   const unsigned int selectionCut = std::stoul(argv[2]);
-  unsigned int numberOfThreads = std::stoul(argv[3]);
+  const int p = std::stoi(argv[3]);
+  unsigned int numberOfThreads = std::stoul(argv[4]);
 
   // O vetor deve ser elementos únicos, seria melhor usar o set,
   // mas teria que colocar os elementos aleatórios nele.
@@ -26,11 +27,11 @@ int main(int argc, char** argv) {
 
   const auto startTime = std::chrono::high_resolution_clock::now();
 
-  // TODO chamar Calculate Selection.
+  randomizedSelect(setA, p, setSize-1, rand()%setSize + 1, numberOfThreads);
 
   const auto endTime = std::chrono::high_resolution_clock::now();
 
-  // TODO Imprimir ith núermo em A, o tempo de execução em segundos, e os valores de A.
+  // TODO Imprimir ith número em A, o tempo de execução em segundos, e os valores de A.
 
   return 0;
 }
