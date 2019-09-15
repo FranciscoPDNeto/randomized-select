@@ -11,9 +11,9 @@ int randomizedSelect(std::vector<int>& setA, const int p,
   if (i == k) 
     return setA[q];
   else if (i < k) 
-    randomizedSelect(setA, p, q - 1, i, numberThread);
+    return randomizedSelect(setA, p, q - 1, i, numberThread);
   else
-    randomizedSelect(setA, q + 1, r, i - k, numberThread);
+    return randomizedSelect(setA, q + 1, r, i - k, numberThread);
   
 }
 
