@@ -1,5 +1,5 @@
 CC := g++
-CFLAGS := -Wall -O3 -std=c++17 -fopenmp
+CFLAGS := -Wall -O3 -std=c++17 -lpthread
 VENDOR := -I vendor
 
 all: bin/sequential bin/parallel

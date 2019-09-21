@@ -1,19 +1,19 @@
 #include "randomizedSelect.h"
 
-int randomizedSelect(std::vector<int>& setA, const int p, 
-                     const int r, const int i, const unsigned int numberThread) {
+int randomizedSelect(std::vector<int>& setA, const int partBegining, 
+                     const int partEnding, const int elementIndex, const unsigned int numberThread) {
 
-  if (p == r)
-    return setA[p];
+  if (partBegining == partEnding)
+    return setA[partBegining];
 
-  int q = randomizedPartition(setA, p, r);
-  int k = q - p + 1;
-  if (i == k) 
-    return setA[q];
-  else if (i < k) 
-    return randomizedSelect(setA, p, q - 1, i, numberThread);
+  int pivotIndex = randomizedPartition(setA, partBegining, partEnding);
+  int k = pivotIndex - partBegining + 1;
+  if (elementIndex == k) 
+    return setA[pivotIndex];
+  else if (elementIndex < k) 
+    return randomizedSelect(setA, partBegining, pivotIndex - 1, elementIndex, numberThread);
   else
-    return randomizedSelect(setA, q + 1, r, i - k, numberThread);
+    return randomizedSelect(setA, pivotIndex + 1, partEnding, elementIndex - k, numberThread);
   
 }
 
