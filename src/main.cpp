@@ -14,8 +14,7 @@ int main(int argc, char** argv) {
 
   unsigned int setSize = std::stoul(argv[1]);
   const unsigned int selectionCut = std::stoul(argv[2]);
-  const int p = std::stoi(argv[3]);
-  unsigned int numberOfThreads = std::stoul(argv[4]);
+  unsigned int numberOfThreads = std::stoul(argv[3]);
 
   // O vetor deve ser elementos únicos, seria melhor usar o set,
   // mas teria que colocar os elementos aleatórios nele.
@@ -27,7 +26,7 @@ int main(int argc, char** argv) {
 
   const auto startTime = std::chrono::high_resolution_clock::now();
 
-  randomizedSelect(setA, p, setSize-1, rand()%setSize + 1, numberOfThreads);
+  randomizedSelect(setA, 0, setSize-1, rand()%setSize + 1, numberOfThreads);
 
   const auto endTime = std::chrono::high_resolution_clock::now();
 
