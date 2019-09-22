@@ -1,26 +1,28 @@
 #include "randomizedSelect.h"
 
 int randomizedSelect(std::vector<int>& setA,
-                     const int partBegining,
+                     const int partBeginning,
                      const int partEnding,
                      const int elementIndex,
                      const unsigned int numberThread) {
-  if (partBegining == partEnding)
-    return setA[partBegining];
+  if (partBeginning == partEnding)
+    return setA[partBeginning];
 
-  int pivotIndex = randomizedPartition(setA, partBegining, partEnding);
-  int k = pivotIndex - partBegining + 1;
+  int pivotIndex = randomizedPartition(setA, partBeginning, partEnding);
+  int k = pivotIndex - partBeginning + 1;
   if (elementIndex == k)
     return setA[pivotIndex];
   else if (elementIndex < k)
-    return randomizedSelect(setA, partBegining, pivotIndex - 1, elementIndex,
+    return randomizedSelect(setA, partBeginning, pivotIndex - 1, elementIndex,
                             numberThread);
   else
     return randomizedSelect(setA, pivotIndex + 1, partEnding, elementIndex - k,
                             numberThread);
 }
 
-int randomizedPartition(std::vector<int>& setA, const int p, const int r) {
+int randomizedPartition(std::vector<int>& setA,
+                        const int partBeginning,
+                        const int partEnding) {
   // modern cpp
   /*
   std::random_device rd;
@@ -29,21 +31,23 @@ int randomizedPartition(std::vector<int>& setA, const int p, const int r) {
   int i = distr(eng);
   */
   // old style kk
-  int i = p + rand() % ((r + 1) - p);
-  std::swap(setA[i], setA[r]);
-  return partition(setA, p, r);
+  int pivotindex = partBeginning + rand() % ((partEnding + 1) - partBeginning);
+  std::swap(setA[pivotindex], setA[partEnding]);
+  return partition(setA, partBeginning, partEnding);
 }
 
-int partition(std::vector<int>& setA, const int p, const int r) {
-  int x = setA[r];
-  int i = p - 1;
-  for (int j = p; j < r; ++j) {
+int partition(std::vector<int>& setA,
+              const int partBeginning,
+              const int partEnding) {
+  int x = setA[partEnding];
+  int pivotIndex = partBeginning - 1;
+  for (int j = partBeginning; j < partEnding; ++j) {
     if (setA[j] <= x) {
-      i += 1;
-      std::swap(setA[i], setA[j]);
+      pivotIndex += 1;
+      std::swap(setA[pivotIndex], setA[j]);
     }
   }
 
-  std::swap(setA[i + 1], setA[r]);
-  return i + 1;
+  std::swap(setA[pivotIndex + 1], setA[partEnding]);
+  return pivotIndex + 1;
 }
