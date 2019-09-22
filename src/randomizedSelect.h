@@ -1,5 +1,5 @@
-#include <stdlib.h>
-#include <algorithm>
+#pragma once
+
 #include <vector>
 
 int randomizedSelect(std::vector<int>& setA,
@@ -11,7 +11,3 @@ int randomizedSelect(std::vector<int>& setA,
 int randomizedPartition(std::vector<int>& setA,
                         const int partBeginning,
                         const int partEnding);
-
-int partition(std::vector<int>& setA,
-              const int partBeginning,
-              const int partEnding);

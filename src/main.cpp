@@ -3,8 +3,8 @@
 #include <iostream>
 #include <limits>
 #include <random>
-#include <unordered_set>
 #include <string>
+#include <unordered_set>
 
 #include "randomizedSelect.h"
 
@@ -32,8 +32,8 @@ int main(int argc, char** argv) {
   std::random_device rd;
   std::mt19937 engine(rd());  // Mersenne twister MT19937
   std::uniform_int_distribution<int> distribution(
-    0, std::numeric_limits<int>::max());
-  
+      0, std::numeric_limits<int>::max());
+
   while (setA.size() != setSize) {
     setA.insert(distribution(engine));
   }
@@ -48,7 +48,8 @@ int main(int argc, char** argv) {
 
   const auto startTime = std::chrono::high_resolution_clock::now();
 
-  const int value = randomizedSelect(vecA, 0, setSize - 1, selectionCut, numberOfThreads);
+  const int value =
+      randomizedSelect(vecA, 0, setSize - 1, selectionCut, numberOfThreads);
 
   const auto endTime = std::chrono::high_resolution_clock::now();
 
