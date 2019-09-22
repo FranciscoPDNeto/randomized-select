@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   // O vetor deve ser elementos únicos, seria melhor usar o set,
   // mas teria que colocar os elementos aleatórios nele.
   std::vector<int> setA;    
-  std::uniform_int_distribution<int> distribution(0, (int)(std::numeric_limits<int>::max));
+  std::uniform_int_distribution<int> distribution(0, std::numeric_limits<int>::max());
   std::mt19937 engine; // Mersenne twister MT19937
   auto generator = std::bind(distribution, engine);
   std::generate_n(setA.begin(), setSize, generator); 

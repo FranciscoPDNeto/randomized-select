@@ -18,7 +18,15 @@ int randomizedSelect(std::vector<int>& setA, const int partBegining,
 }
 
 int randomizedPartition(std::vector<int>& setA, const int p, const int r) {
-  int i = rand() % r + 1;
+  // modern cpp
+  /*
+  std::random_device rd;
+  std::mt19937 eng(rd());
+  std::uniform_int_distribution<> distr(p, r);
+  int i = distr(eng);
+  */
+  // old style kk
+  int i = p + rand() % ((r + 1) - p);
   std::swap(setA[i], setA[r]);
   return partition(setA, p, r);
 }
