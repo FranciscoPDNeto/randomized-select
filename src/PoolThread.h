@@ -33,6 +33,7 @@ public:
 
   void init();
   void destroy();
+  void wait(bool unlock = true);
   void executeThread();
   void addTask(Task *task);
   void addTasks(std::vector<Task *> tasks);

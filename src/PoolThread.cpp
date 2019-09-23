@@ -41,13 +41,18 @@ void PoolThread::addTasks(std::vector<Task *> tasks) {
     addTask(task);
 }
 
+void PoolThread::wait(bool unlock) {
+  pthread_mutex_lock(&m_taskMutex);
+  while (m_poolState != PoolState::STOPPED && m_tasks.empty()) {
+    pthread_cond_wait(&m_taskCond, &m_taskMutex);
+  }
+  if (unlock)
+    pthread_mutex_unlock(&m_taskMutex);
+}
+
 void PoolThread::executeThread() {
   while (m_poolState != PoolState::STOPPED) {
-
-    pthread_mutex_lock(&m_taskMutex);
-    while (m_poolState != PoolState::STOPPED && m_tasks.empty()) {
-      pthread_cond_wait(&m_taskCond, &m_taskMutex);
-    }
+    wait(false);
 
     if (m_poolState == PoolState::STOPPED) {
       pthread_mutex_unlock(&m_taskMutex);
