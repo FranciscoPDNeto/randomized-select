@@ -10,7 +10,8 @@ int randomizedSelect(std::vector<int>& setA,
   if (partBeginning == partEnding)
     return setA[partBeginning];
 
-  int pivotIndex = randomizedPartition(setA, partBeginning, partEnding, numberThreads);
+  int pivotIndex =
+      randomizedPartition(setA, partBeginning, partEnding, numberThreads);
   int k = pivotIndex - partBeginning + 1;
   if (elementIndex == k)
     return setA[pivotIndex];

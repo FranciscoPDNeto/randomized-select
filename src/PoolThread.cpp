@@ -1,8 +1,8 @@
-#include <iostream>
 #include "PoolThread.h"
+#include <iostream>
 
-void *startThread(void *arg) {
-  PoolThread *poolThread = (PoolThread *) arg;
+void* startThread(void* arg) {
+  PoolThread* poolThread = (PoolThread*)arg;
   poolThread->executeThread();
 
   return NULL;
@@ -21,7 +21,7 @@ PoolThread::~PoolThread() {
 void PoolThread::init() {
   m_poolState = PoolState::STARTED;
   pthread_mutex_init(&m_taskMutex, NULL);
-	pthread_cond_init(&m_taskCond, NULL);
+  pthread_cond_init(&m_taskCond, NULL);
 
   for (int i = 0; i < m_poolSize; i++) {
     pthread_t thread;
@@ -31,17 +31,16 @@ void PoolThread::init() {
     }
     m_threads.push_back(thread);
   }
-
 }
 
-void PoolThread::addTask(Task *task) {
+void PoolThread::addTask(Task* task) {
   pthread_mutex_lock(&m_taskMutex);
   m_tasks.push(task);
   pthread_cond_signal(&m_taskCond);
   pthread_mutex_unlock(&m_taskMutex);
 }
 
-void PoolThread::addTasks(std::vector<Task *> tasks) {
+void PoolThread::addTasks(std::vector<Task*> tasks) {
   for (const auto& task : tasks)
     addTask(task);
 }
@@ -64,7 +63,7 @@ void PoolThread::executeThread() {
       pthread_exit(NULL);
     }
 
-    Task *task = m_tasks.front();
+    Task* task = m_tasks.front();
     m_tasks.pop();
     pthread_mutex_unlock(&m_taskMutex);
     task->run();
@@ -79,11 +78,11 @@ void PoolThread::destroy() {
   pthread_cond_broadcast(&m_taskCond);
 
   for (int i = 0; i < m_poolSize; i++) {
-    void *threadReturn;
+    void* threadReturn;
     pthread_join(m_threads[i], &threadReturn);
   }
   while (!m_tasks.empty()) {
-    Task *task = m_tasks.front();
+    Task* task = m_tasks.front();
     m_tasks.pop();
     delete task;
   }
