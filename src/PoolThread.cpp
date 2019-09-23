@@ -8,6 +8,11 @@ void *startThread(void *arg) {
   return NULL;
 }
 
+PoolThread& PoolThread::getInstance(const int poolSize) {
+  static PoolThread instance(poolSize);
+  return instance;
+}
+
 PoolThread::~PoolThread() {
   if (m_poolState != PoolState::STOPPED)
     destroy();

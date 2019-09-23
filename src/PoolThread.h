@@ -21,6 +21,8 @@ enum PoolState {
 
 class PoolThread {
 private:
+  PoolThread(const int poolSize) : m_poolSize(poolSize) {};
+
   int m_poolSize;
   std::vector<pthread_t> m_threads;
   pthread_mutex_t m_taskMutex;
@@ -28,7 +30,6 @@ private:
   std::queue<Task*> m_tasks;
   PoolState m_poolState;
 public:
-  PoolThread(const int poolSize) : m_poolSize(poolSize) {};
   ~PoolThread();
 
   void init();
@@ -37,4 +38,7 @@ public:
   void executeThread();
   void addTask(Task *task);
   void addTasks(std::vector<Task *> tasks);
+
+  static PoolThread& getInstance(const int poolSize);
+  void operator=(PoolThread const&) = delete;
 };
