@@ -1,7 +1,34 @@
 #include <pthread.h>
+#include <iostream>
+#include "PoolThread.h"
 #include "partition.h"
 
 std::vector<int> prefixSum(const std::vector<int> mask, bool invert = false);
+
+class SetMaskParameters {
+ public:
+  std::vector<int>& setA;
+  std::vector<int>& mask;
+  int partBeginning;
+  int pivot;
+  int i;
+  SetMaskParameters(std::vector<int>& setA,
+                    std::vector<int>& mask,
+                    int partBeginning,
+                    int pivot,
+                    int i)
+      : setA(setA),
+        mask(mask),
+        partBeginning(partBeginning),
+        pivot(pivot),
+        i(i) {}
+};
+void setMask(void* parameters) {
+  SetMaskParameters* p = (SetMaskParameters*)parameters;
+  p->mask[p->i] = p->setA[p->i + p->partBeginning] <= p->pivot ? 1 : 0;
+  std::cout << "[" << p->i << "]" << std::flush;
+  delete p;
+}
 
 int partition(std::vector<int>& setA,
               const int partBeginning,
@@ -9,10 +36,17 @@ int partition(std::vector<int>& setA,
               const unsigned int numberThreads) {
   int pivot = setA[partEnding];
 
-  // parallel
+  PoolThread& pool = PoolThread::getInstance(numberThreads);
+  pool.init();
+
   std::vector<int> mask(partEnding - partBeginning + 1);
-  for (int i = 0; i <= partEnding - partBeginning; i++)
-    mask[i] = setA[i + partBeginning] <= pivot ? 1 : 0;
+  for (int i = 0; i <= partEnding - partBeginning; i++) {
+    SetMaskParameters* parameters =
+        new SetMaskParameters(setA, mask, partBeginning, pivot, i);
+    pool.addTask(new Task(&setMask, (void*)parameters));
+  }
+  pool.wait();
+  std::cout << std::endl << "[done]" << std::endl;
 
   std::vector<int> lessPrefixSum = prefixSum(mask);
   std::vector<int> greaterPrefixSum = prefixSum(mask, true);
