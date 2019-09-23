@@ -22,6 +22,7 @@ void PoolThread::init() {
   m_poolState = PoolState::STARTED;
   pthread_mutex_init(&m_taskMutex, NULL);
   pthread_cond_init(&m_taskCond, NULL);
+  remaining = 0;
 
   for (int i = 0; i < m_poolSize; i++) {
     pthread_t thread;
@@ -36,6 +37,7 @@ void PoolThread::init() {
 void PoolThread::addTask(Task* task) {
   pthread_mutex_lock(&m_taskMutex);
   m_tasks.push(task);
+  remaining++;
   pthread_cond_signal(&m_taskCond);
   pthread_mutex_unlock(&m_taskMutex);
 }
@@ -45,18 +47,20 @@ void PoolThread::addTasks(std::vector<Task*> tasks) {
     addTask(task);
 }
 
-void PoolThread::wait(bool unlock) {
+void PoolThread::wait() {
   pthread_mutex_lock(&m_taskMutex);
-  while (m_poolState != PoolState::STOPPED && m_tasks.empty()) {
+  while (m_poolState != PoolState::STOPPED && remaining) {
     pthread_cond_wait(&m_taskCond, &m_taskMutex);
   }
-  if (unlock)
-    pthread_mutex_unlock(&m_taskMutex);
+  pthread_mutex_unlock(&m_taskMutex);
 }
 
 void PoolThread::executeThread() {
   while (m_poolState != PoolState::STOPPED) {
-    wait(false);
+    pthread_mutex_lock(&m_taskMutex);
+    while (m_poolState != PoolState::STOPPED && m_tasks.empty()) {
+      pthread_cond_wait(&m_taskCond, &m_taskMutex);
+    }
 
     if (m_poolState == PoolState::STOPPED) {
       pthread_mutex_unlock(&m_taskMutex);
@@ -68,6 +72,11 @@ void PoolThread::executeThread() {
     pthread_mutex_unlock(&m_taskMutex);
     task->run();
     delete task;
+
+    pthread_mutex_lock(&m_taskMutex);
+    remaining--;
+    pthread_cond_broadcast(&m_taskCond);
+    pthread_mutex_unlock(&m_taskMutex);
   }
 }
 

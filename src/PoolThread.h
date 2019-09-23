@@ -26,17 +26,19 @@ class PoolThread {
   pthread_cond_t m_taskCond;
   std::queue<Task*> m_tasks;
   PoolState m_poolState;
+  int remaining;
 
  public:
   ~PoolThread();
 
   void init();
   void destroy();
-  void wait(bool unlock = true);
+  void wait();
   void executeThread();
   void addTask(Task* task);
   void addTasks(std::vector<Task*> tasks);
 
   static PoolThread& getInstance(const int poolSize);
+  PoolThread(PoolThread const&) = delete;
   void operator=(PoolThread const&) = delete;
 };
