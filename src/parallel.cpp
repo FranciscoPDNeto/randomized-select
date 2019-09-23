@@ -1,10 +1,12 @@
+#include <pthread.h>
 #include "partition.h"
 
 std::vector<int> prefixSum(const std::vector<int> mask, bool invert = false);
 
 int partition(std::vector<int>& setA,
               const int partBeginning,
-              const int partEnding) {
+              const int partEnding,
+              const unsigned int numberThreads) {
   int pivot = setA[partEnding];
 
   // parallel
