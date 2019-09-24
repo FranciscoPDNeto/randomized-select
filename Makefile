@@ -6,13 +6,13 @@ all: bin/sequential bin/parallel
 
 bin/sequential: build/sequential.o
 bin/parallel: build/parallel.o
-bin/sequential bin/parallel: build/randomizedSelect.o build/main.o
+bin/sequential bin/parallel: build/PoolThread.o build/randomizedSelect.o build/main.o
 	mkdir -p bin
 	$(CC) $(CFLAGS) -o $@ $^
 
 bin/test-sequential: build/sequential.o
 bin/test-parallel: build/parallel.o
-bin/test-sequential bin/test-parallel: build/randomizedSelect.o build/test.o
+bin/test-sequential bin/test-parallel: build/PoolThread.o build/randomizedSelect.o build/test.o
 	mkdir -p bin
 	$(CC) $(CFLAGS) -o $@ $^
 

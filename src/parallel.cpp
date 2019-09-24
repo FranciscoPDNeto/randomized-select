@@ -26,7 +26,6 @@ class SetMaskParameters {
 void setMask(void* parameters) {
   SetMaskParameters* p = (SetMaskParameters*)parameters;
   p->mask[p->i] = p->setA[p->i + p->partBeginning] <= p->pivot ? 1 : 0;
-  std::cout << "[" << p->i << "]" << std::flush;
   delete p;
 }
 
@@ -37,7 +36,6 @@ int partition(std::vector<int>& setA,
   int pivot = setA[partEnding];
 
   PoolThread& pool = PoolThread::getInstance(numberThreads);
-  pool.init();
 
   std::vector<int> mask(partEnding - partBeginning + 1);
   for (int i = 0; i <= partEnding - partBeginning; i++) {
@@ -46,7 +44,6 @@ int partition(std::vector<int>& setA,
     pool.addTask(new Task(&setMask, (void*)parameters));
   }
   pool.wait();
-  std::cout << std::endl << "[done]" << std::endl;
 
   std::vector<int> lessPrefixSum = prefixSum(mask);
   std::vector<int> greaterPrefixSum = prefixSum(mask, true);

@@ -18,8 +18,7 @@ enum PoolState { STARTED, STOPPED };
 
 class PoolThread {
  private:
-  PoolThread(const int poolSize) : m_poolSize(poolSize){};
-
+  PoolThread(const int poolSize);
   int m_poolSize;
   std::vector<pthread_t> m_threads;
   pthread_mutex_t m_taskMutex;

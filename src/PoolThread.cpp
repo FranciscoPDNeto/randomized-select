@@ -13,6 +13,10 @@ PoolThread& PoolThread::getInstance(const int poolSize) {
   return instance;
 }
 
+PoolThread::PoolThread(const int poolSize) : m_poolSize(poolSize){
+  this->init();
+};
+
 PoolThread::~PoolThread() {
   if (m_poolState != PoolState::STOPPED)
     destroy();
