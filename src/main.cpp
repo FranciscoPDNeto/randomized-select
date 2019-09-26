@@ -39,7 +39,6 @@ int main(int argc, char** argv) {
   }
 
   std::vector<int> vecA(setA.begin(), setA.end());
-  setA.~unordered_set();
   std::cout << "Vector generated: ";
   for (const int a : vecA) {
     std::cout << a << " ";
@@ -54,6 +53,10 @@ int main(int argc, char** argv) {
   const auto endTime = std::chrono::high_resolution_clock::now();
 
   std::cout << "Result:" << value << std::endl;
+  const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+      endTime - startTime);
+
+  std::cout << duration.count() << " ms" << std::endl;
 
   // TODO Imprimir ith número em A, o tempo de execução em segundos, e os
   // valores de A.
