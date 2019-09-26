@@ -23,6 +23,42 @@ class SetMaskParameters {
         pivot(pivot),
         i(i) {}
 };
+struct SwapSetValuesParameters {
+  std::vector<int>& setA;
+  std::vector<int>& mask;
+  std::vector<int>& lessPrefixSum;
+  std::vector<int>& greaterPrefixSum;
+  std::vector<int>& buffer;
+  int partBeginning;
+  int greaterBeginning;
+  int i;
+
+  SwapSetValuesParameters(std::vector<int>& setA,
+                          std::vector<int>& mask,
+                          std::vector<int>& lessPrefixSum,
+                          std::vector<int>& greaterPrefixSum,
+                          std::vector<int>& buffer,
+                          int partBeginning,
+                          int greaterBeginning,
+                          int i)
+      : setA(setA),
+        mask(mask),
+        lessPrefixSum(lessPrefixSum),
+        greaterPrefixSum(greaterPrefixSum),
+        buffer(buffer),
+        partBeginning(partBeginning),
+        greaterBeginning(greaterBeginning),
+        i(i) {}
+
+};
+void swapSetValues(void* parameters) {
+  SwapSetValuesParameters* p = (SwapSetValuesParameters*)parameters;
+  if (p->mask[p->i])
+    p->setA[p->partBeginning + p->lessPrefixSum[p->i] - 1] = p->buffer[p->i];
+  else
+    p->setA[p->greaterBeginning + p->greaterPrefixSum[p->i] - 1] = p->buffer[p->i];
+}
+
 void setMask(void* parameters) {
   SetMaskParameters* p = (SetMaskParameters*)parameters;
   p->mask[p->i] = p->setA[p->i + p->partBeginning] <= p->pivot ? 1 : 0;
@@ -48,15 +84,15 @@ int partition(std::vector<int>& setA,
   std::vector<int> lessPrefixSum = prefixSum(mask);
   std::vector<int> greaterPrefixSum = prefixSum(mask, true);
 
-  // parallel
   std::vector<int> buffer(&setA[partBeginning], &setA[partEnding] + 1);
   int greaterBeginning = partBeginning + lessPrefixSum.back();
   for (int i = 0; i <= partEnding - partBeginning; i++) {
-    if (mask[i])
-      setA[partBeginning + lessPrefixSum[i] - 1] = buffer[i];
-    else
-      setA[greaterBeginning + greaterPrefixSum[i] - 1] = buffer[i];
+    SwapSetValuesParameters* parameters = 
+      new SwapSetValuesParameters(setA, mask, lessPrefixSum, 
+        greaterPrefixSum, buffer, partBeginning, greaterBeginning, i);
+    pool.addTask(new Task(&swapSetValues, (void*)parameters));
   }
+  pool.wait();
   return greaterBeginning - 1;
 }
 
