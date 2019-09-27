@@ -1,18 +1,22 @@
-#include "partition.h"
+#include "randomizedSelect.h"
 
-int partition(std::vector<int>& setA,
-              const int partBeginning,
-              const int partEnding,
-              const unsigned int numberThreads) {
-  int pivot = setA[partEnding];
-  int i = partBeginning - 1;
-  for (int j = partBeginning; j < partEnding; ++j) {
-    if (setA[j] <= pivot) {
-      i += 1;
-      std::swap(setA[i], setA[j]);
-    }
-  }
+int randomizedSelect(std::vector<int>& setA,
+                     const int partBeginning,
+                     const int partEnding,
+                     const int elementIndex,
+                     const unsigned int numberThreads) {
+  if (partBeginning == partEnding)
+    return setA[partBeginning];
 
-  std::swap(setA[i + 1], setA[partEnding]);
-  return i + 1;
+  int pivotIndex =
+      randomizedPartition(setA, partBeginning, partEnding, numberThreads);
+  int k = pivotIndex - partBeginning + 1;
+  if (elementIndex == k)
+    return setA[pivotIndex];
+  else if (elementIndex < k)
+    return randomizedSelect(setA, partBeginning, pivotIndex - 1, elementIndex,
+                            numberThreads);
+  else
+    return randomizedSelect(setA, pivotIndex + 1, partEnding, elementIndex - k,
+                            numberThreads);
 }

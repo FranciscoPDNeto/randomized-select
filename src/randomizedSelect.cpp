@@ -2,27 +2,6 @@
 #include <algorithm>
 #include "partition.h"
 
-int randomizedSelect(std::vector<int>& setA,
-                     const int partBeginning,
-                     const int partEnding,
-                     const int elementIndex,
-                     const unsigned int numberThreads) {
-  if (partBeginning == partEnding)
-    return setA[partBeginning];
-
-  int pivotIndex =
-      randomizedPartition(setA, partBeginning, partEnding, numberThreads);
-  int k = pivotIndex - partBeginning + 1;
-  if (elementIndex == k)
-    return setA[pivotIndex];
-  else if (elementIndex < k)
-    return randomizedSelect(setA, partBeginning, pivotIndex - 1, elementIndex,
-                            numberThreads);
-  else
-    return randomizedSelect(setA, pivotIndex + 1, partEnding, elementIndex - k,
-                            numberThreads);
-}
-
 int randomizedPartition(std::vector<int>& setA,
                         const int partBeginning,
                         const int partEnding,
@@ -30,4 +9,21 @@ int randomizedPartition(std::vector<int>& setA,
   int pivotindex = partBeginning + rand() % ((partEnding + 1) - partBeginning);
   std::swap(setA[pivotindex], setA[partEnding]);
   return partition(setA, partBeginning, partEnding, numberThreads);
+}
+
+int partition(std::vector<int>& setA,
+              const int partBeginning,
+              const int partEnding,
+              const unsigned int numberThreads) {
+  int pivot = setA[partEnding];
+  int i = partBeginning - 1;
+  for (int j = partBeginning; j < partEnding; ++j) {
+    if (setA[j] <= pivot) {
+      i += 1;
+      std::swap(setA[i], setA[j]);
+    }
+  }
+
+  std::swap(setA[i + 1], setA[partEnding]);
+  return i + 1;
 }
