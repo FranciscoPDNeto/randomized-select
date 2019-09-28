@@ -59,17 +59,16 @@ struct SwapSetValuesParameters {
 void swapSetValues(void* parameters) {
   SwapSetValuesParameters* p = (SwapSetValuesParameters*)parameters;
   for (int i = p->i; i < p->i + p->size; i++) {
-    if (p->mask[i])
-      p->setA[p->partBeginning + p->lessPrefixSum[i] - 1] = p->buffer[i];
-    else
-      p->setA[p->greaterBeginning + p->greaterPrefixSum[i] - 1] = p->buffer[i];
+    auto less = p->mask[i] * (p->partBeginning + p->lessPrefixSum[i]);
+    auto greater = !p->mask[i] * (p->greaterBeginning + p->greaterPrefixSum[i]);
+    p->setA[less + greater - 1] = p->buffer[i];
   }
 }
 
 void setMask(void* parameters) {
   SetMaskParameters* p = (SetMaskParameters*)parameters;
   for (int i = p->i; i < p->i + p->size; i++ ) {
-    p->mask[i] = p->setA[i + p->partBeginning] <= p->pivot ? 1 : 0;
+    p->mask[i] = p->setA[i + p->partBeginning] <= p->pivot;
   }
   delete p;
 }
@@ -119,11 +118,9 @@ int partition(std::vector<int>& setA,
 }
 
 std::vector<int> prefixSum(const std::vector<int> mask, bool invert) {
-  // parallel
   std::vector<int> sum(mask);
-  if (invert)
-    sum[0] = !sum[0];
+  sum[0] ^= invert;
   for (std::vector<int>::size_type i = 1; i < sum.size(); i++)
-    sum[i] = sum[i - 1] + (invert ? !sum[i] : sum[i]);
+    sum[i] = sum[i - 1] + (invert ^ sum[i]);
   return sum;
 }
