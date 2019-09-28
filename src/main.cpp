@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <iomanip>
 #include <limits>
 #include <random>
 #include <string>
@@ -40,23 +41,25 @@ int main(int argc, char** argv) {
 
   std::vector<int> vecA(setA.begin(), setA.end());
   std::cout << "Vector generated: ";
-  for (const int a : vecA) {
-    std::cout << a << " ";
-  }
   std::cout << std::endl;
 
-  const auto startTime = std::chrono::high_resolution_clock::now();
+  clock_t tStart = clock();
 
   const int value =
       randomizedSelect(vecA, 0, setSize - 1, selectionCut, numberOfThreads);
 
-  const auto endTime = std::chrono::high_resolution_clock::now();
+  clock_t tEnd = clock();
 
-  std::cout << "Result:" << value << std::endl;
-  const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-      endTime - startTime);
-
-  std::cout << duration.count() << " ms" << std::endl;
+  if (type == "all") {
+    for (const int a : vecA) {
+      std::cout << a << " ";
+    }
+    std::cout << std::endl;
+    std::cout << value << std::endl;
+  }
+  
+  const double duration = double(tEnd - tStart)/CLOCKS_PER_SEC;
+  std::cout << std::setprecision(6) << duration << " seconds" << std::endl;
 
   // TODO Imprimir ith número em A, o tempo de execução em segundos, e os
   // valores de A.
