@@ -10,8 +10,10 @@
 #include "randomizedSelect.h"
 
 int main(int argc, char** argv) {
-  if (argc != 5)
+  if (argc != 5) {
+    std::cerr << "The program needs 5 arguments, just " << argc << " were given." << std::endl;
     return -1;
+  }
 
   unsigned int setSize = std::stoul(argv[1]);
   const unsigned int selectionCut = std::stoul(argv[2]);
@@ -28,6 +30,7 @@ int main(int argc, char** argv) {
   auto generator = std::bind(distribution, engine);
   std::generate_n(setA.begin(), setSize, generator);
   */
+  clock_t tListStart = clock();
   std::unordered_set<int> setA;
   setA.reserve(setSize);
   std::random_device rd;
@@ -40,8 +43,6 @@ int main(int argc, char** argv) {
   }
 
   std::vector<int> vecA(setA.begin(), setA.end());
-  std::cout << "Vector generated: ";
-  std::cout << std::endl;
 
   clock_t tStart = clock();
 
@@ -59,7 +60,9 @@ int main(int argc, char** argv) {
   }
   
   const double duration = double(tEnd - tStart)/CLOCKS_PER_SEC;
-  std::cout << std::setprecision(6) << duration << " seconds" << std::endl;
+  const double durationWithListTime = double(tEnd - tListStart)/CLOCKS_PER_SEC;
+  std::cout << "Without list generator time: " << std::setprecision(6) << duration << " seconds" << std::endl;
+  std::cout << "With list generator time: " << std::setprecision(6) << durationWithListTime << " seconds" << std::endl;
 
   // TODO Imprimir ith número em A, o tempo de execução em segundos, e os
   // valores de A.

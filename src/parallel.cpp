@@ -79,19 +79,22 @@ int partition(std::vector<int>& setA,
 
   PoolThread& pool = PoolThread::getInstance(numberThreads);
 
+  const int granularity = 4 * numberThreads;
+
   const int maskSize = partEnding - partBeginning + 1;
   std::vector<int> mask(maskSize);
-  const int sizePerThread = maskSize / numberThreads;
-  const int lastThreadSize = sizePerThread + maskSize % numberThreads;
+  const int sizePerTask = maskSize / granularity;
+  const int lastTaskSize = sizePerTask + maskSize % granularity;
 
-  unsigned int i;
-  for (i = 0; i < numberThreads - 1; i++)
-    pool.addTask(new Task(
-        &setMask, new SetMaskParameters(setA, mask, partBeginning, pivot,
-                                        i * sizePerThread, sizePerThread)));
-  pool.addTask(new Task(
-      &setMask, new SetMaskParameters(setA, mask, partBeginning, pivot,
-                                      i * sizePerThread, lastThreadSize)));
+  int i;
+  for (i = 0; i < granularity - 1; i++) {
+    SetMaskParameters* parameters = new SetMaskParameters(
+        setA, mask, partBeginning, pivot, i * sizePerTask, sizePerTask);
+    pool.addTask(new Task(&setMask, (void*)parameters));
+  }
+  SetMaskParameters* parameters = new SetMaskParameters(
+      setA, mask, partBeginning, pivot, i * sizePerTask, lastTaskSize);
+  pool.addTask(new Task(&setMask, (void*)parameters));
   pool.wait();
 
   std::vector<int> lessPrefixSum = prefixSum(mask);
@@ -100,18 +103,16 @@ int partition(std::vector<int>& setA,
   std::vector<int> buffer(&setA[partBeginning], &setA[partEnding] + 1);
   int greaterBeginning = partBeginning + lessPrefixSum.back();
 
-  for (i = 0; i < numberThreads - 1; i++) {
-    pool.addTask(new Task(
-        &swapSetValues,
-        new SwapSetValuesParameters(setA, mask, lessPrefixSum, greaterPrefixSum,
-                                    buffer, partBeginning, greaterBeginning,
-                                    i * sizePerThread, sizePerThread)));
+  for (int i = 0; i < granularity - 1; i++) {
+    SwapSetValuesParameters* parameters = new SwapSetValuesParameters(
+        setA, mask, lessPrefixSum, greaterPrefixSum, buffer, partBeginning,
+        greaterBeginning, i * sizePerTask, sizePerTask);
+    pool.addTask(new Task(&swapSetValues, (void*)parameters));
   }
-  pool.addTask(new Task(
-      &swapSetValues,
-      new SwapSetValuesParameters(setA, mask, lessPrefixSum, greaterPrefixSum,
-                                  buffer, partBeginning, greaterBeginning,
-                                  i * sizePerThread, lastThreadSize)));
+  SwapSetValuesParameters* parametersSwap = new SwapSetValuesParameters(
+      setA, mask, lessPrefixSum, greaterPrefixSum, buffer, partBeginning,
+      greaterBeginning, i * sizePerTask, lastTaskSize);
+  pool.addTask(new Task(&swapSetValues, (void*)parametersSwap));
   pool.wait();
   return greaterBeginning - 1;
 }
